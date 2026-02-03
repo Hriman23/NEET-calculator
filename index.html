@@ -1,20 +1,129 @@
 <!DOCTYPE html>
 <html>
-    <head>
-      <title>Nova NEET Calculator</title>
-    </head>
+  <head>
+    <title>Nova NEET Calculator</title>
+    <style>
+      .screen {
+        display: none;
+      }
+      .screen.active {
+        display: block;
+      }
+      button {
+        padding: 15px;
+        margin: 10px;
+        font-size: 16px;
+      }
+    </style>
+  </head>
 
-    <body>
-        <h1 id="title">Hello 👋</h1>
-        <p id="status">If you can see this, Nova is alive 💙</p>
+  <body>
+    <!-- HOME SCREEN -->
+    <div id="home" class="screen active">
+      <h2>What do you want to do?</h2>
+      <button onclick="showScreen('calculate')">Calculate Marks</button>
+      <button onclick="showScreen('history')">Check Previous Marks</button>
+    </div>
 
-        <button onclick="sayHi()">Click me</button>
+    <!-- CALCULATE SCREEN -->
+    <div id="calculate" class="screen">
+        <h2>Calculate Marks</h2>
+        
+        <label>
+            Test Name:
+            <input id="testName" type="text" placeholder="Mastery 1.1">
+        </label>
+        <br><br>
 
-        <script>
-            function sayHi() {
-                document.getElementById("status").innerText =
-                    "Nova is listening 😤✨";
-            }
-        </script>
-    </body>
+        <label>
+            Physics Correct:
+            <input id="phyC" type="number">
+        </label>
+        <br>
+
+        <label>
+            Physics Wrong:
+            <input id="phyW" type="number">
+        </label>
+        <br><br>
+
+        <br><br>
+
+        <label>
+            Chemistry Correct:
+            <input id="chemC" type="number">
+        </label>
+        <br>
+
+        <label>
+            Chemistry Wrong:
+            <input id="chemW" type="number">
+        </label>
+
+
+        <p id="phyResult"></p>
+        <p id="chemResult"></p>
+        <button onclick="calculatePhysics()">Calculate Physics</button>
+        <button onclick="calculateChemistry()">Calculate Chemistry</button>
+        <button onclick="showScreen('home')">⬅ Back</button>
+
+    </div>
+
+
+    <!-- HISTORY SCREEN -->
+    <div id="history" class="screen">
+      <h2>Previous Marks</h2>
+      <p>(Saved tests will appear here later)</p>
+      <button onclick="showScreen('home')">⬅ Back</button>
+    </div>
+
+    <script>
+        function showScreen(screenId) {
+            document.querySelectorAll(".screen").forEach(function (screen) {
+                screen.classList.remove("active");
+            });
+            document.getElementById(screenId).classList.add("active");
+        }
+
+        function readInputs() {
+            const name = document.getElementById("testName").value;
+            const phyC = document.getElementById("phyC").value;
+            const phyW = document.getElementById("phyW").value;
+
+            alert(
+                "Test: " + name +
+                "\nPhysics Correct: " + phyC +
+                "\nPhysics Wrong: " + phyW
+            );
+        }
+
+        function showScreen(screenId) {
+            document.querySelectorAll(".screen").forEach(function (screen) {
+                screen.classList.remove("active");
+            });
+            document.getElementById(screenId).classList.add("active");
+        }
+
+        function calculatePhysics() {
+            const phyC = Number(document.getElementById("phyC").value) || 0;
+            const phyW = Number(document.getElementById("phyW").value) || 0;
+
+            const score = phyC * 4 - phyW;
+
+            document.getElementById("phyResult").innerText =
+                "Physics score: " + score;
+        }
+
+        function calculateChemistry() {
+            const chemC = Number(document.getElementById("chemC").value) || 0;
+            const chemW = Number(document.getElementById("chemW").value) || 0;
+
+            const score = chemC * 4 - chemW;
+
+            document.getElementById("chemResult").innerText =
+                "Chemistry score: " + score;
+        }
+
+    </script>
+  </body>
 </html>
