@@ -140,7 +140,7 @@
             const score = phyC * 4 - phyW;
 
             document.getElementById("phyResult").innerText =
-                "Physics score: " + score;
+                "Physics score: " + score + " / 180";
         }
 
         function calculateChemistry() {
@@ -150,7 +150,7 @@
             const score = chemC * 4 - chemW;
 
             document.getElementById("chemResult").innerText =
-                "Chemistry score: " + score;
+                "Chemistry score: " + score + " / 180";
         }
 
         function calculateBotany() {
@@ -160,7 +160,7 @@
             const score = botC * 4 - botW;
 
             document.getElementById("botResult").innerText =
-                "Botany score: " + score;
+                "Botany score: " + score + " / 180";
         }
         
         function calculateZoology() {
@@ -170,7 +170,7 @@
             const score = zooC * 4 - zooW;
 
             document.getElementById("zooResult").innerText =
-                "Zoology score: " + score;
+                "Zoology score: " + score + " / 180";
         }
 
         function calculateTotal() {
@@ -194,9 +194,9 @@
             const total = phyScore + chemScore + botScore + zooScore;
 
             document.getElementById("totalResult").innerText =
-                "TOTAL SCORE: " + total;
+                "TOTAL SCORE: " + total + " / 720";
         }
-
+        
     </script>
   </body>
 </html>
