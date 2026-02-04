@@ -36,6 +36,13 @@
         </label>
         <br><br>
 
+        <label id="editRemarkWrapper" style="display:none;">
+            Edit Remark:
+            <input id="editRemark" type="text"
+                placeholder="Why are you editing this test?">
+        </label>
+
+
         <label>
             Test Type:
             <select id="testType">
@@ -104,6 +111,7 @@
         <p id="percentageResult"></p>
         <p id="equivalentResult"></p>
         <p id="metaInfo"></p>
+        <p id="remarkDisplay" style="display:none;"></p>
         <button onclick="calculatePhysics()">Get Physics Marks</button>
         <button onclick="calculateChemistry()">Get Chemistry Marks</button>
         <button onclick="calculateBotany()">Get Botany Marks</button>
@@ -360,8 +368,10 @@
                 testType,
                 version: logs[index].version + 1,
                 updatedAt: now,
+                editRemark: document.getElementById("editRemark").value || "",
                 rawData
             };
+
 
             localStorage.setItem("neetLogs", JSON.stringify(logs));
             currentViewingTest = logs[index];
@@ -399,6 +409,7 @@
 
             document.getElementById("testName").value = log.testName;
             document.getElementById("testType").value = log.testType;
+            document.getElementById("editRemark").value = log.editRemark || "";
 
             document.getElementById("phyC").value = log.rawData.phyC;
             document.getElementById("phyW").value = log.rawData.phyW;
@@ -428,6 +439,15 @@
                 " | Updated: " + updated +
                 " | v" + log.version;
             
+            // Show remark in VIEW MODE
+            if (log.editRemark) {
+                document.getElementById("remarkDisplay").innerText =
+                    "Remark: " + log.editRemark;
+                document.getElementById("remarkDisplay").style.display = "block";
+            } else {
+                document.getElementById("remarkDisplay").style.display = "none";
+            }
+
             // 🔁 Mark that we are editing an existing test
             document.querySelector(
                 "button[onclick='saveTest()']"
@@ -443,6 +463,8 @@
 
 
         function resetCalculateScreen() {
+            document.getElementById("remarkDisplay").style.display = "none";
+
             // Clear inputs
             document.querySelectorAll("#calculate input")
                 .forEach(el => {
@@ -463,6 +485,8 @@
 
             // Force EDIT MODE visuals
             enterEditMode();
+
+            document.getElementById("editRemark").value = "";
         }
 
         function enterViewMode() {
@@ -502,6 +526,15 @@
             } else {
                 document.getElementById("saveBtn").innerText = "Update Score";
             }
+            
+            // Show remark input only when editing existing test
+            if (currentViewingTest !== null) {
+                document.getElementById("editRemarkWrapper").style.display = "block";
+            } else {
+                document.getElementById("editRemarkWrapper").style.display = "none";
+            }
+
+            document.getElementById("remarkDisplay").style.display = "none";
         }
 
         function deleteCurrentTest() {
