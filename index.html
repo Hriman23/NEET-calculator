@@ -90,10 +90,12 @@
         <p id="chemResult"></p>
         <p id="botResult"></p>
         <p id="zooResult"></p>
+        <p id="totalResult"></p>
         <button onclick="calculatePhysics()">Calculate Physics</button>
         <button onclick="calculateChemistry()">Calculate Chemistry</button>
         <button onclick="calculateBotany()">Calculate Botany</button>
         <button onclick="calculateZoology()">Calculate Zoology</button>
+        <button onclick="calculateTotal()">Calculate TOTAL</button>
         <button onclick="showScreen('home')">⬅ Back</button>
 
     </div>
@@ -171,6 +173,30 @@
 
             document.getElementById("zooResult").innerText =
                 "Zoology score: " + score;
+        }
+
+        function calculateTotal() {
+            const phyC = Number(document.getElementById("phyC").value) || 0;
+            const phyW = Number(document.getElementById("phyW").value) || 0;
+
+            const chemC = Number(document.getElementById("chemC").value) || 0;
+            const chemW = Number(document.getElementById("chemW").value) || 0;
+
+            const botC = Number(document.getElementById("botC").value) || 0;
+            const botW = Number(document.getElementById("botW").value) || 0;
+
+            const zooC = Number(document.getElementById("zooC").value) || 0;
+            const zooW = Number(document.getElementById("zooW").value) || 0;
+
+            const phyScore = phyC * 4 - phyW;
+            const chemScore = chemC * 4 - chemW;
+            const botScore = botC * 4 - botW;
+            const zooScore = zooC * 4 - zooW;
+
+            const total = phyScore + chemScore + botScore + zooScore;
+
+            document.getElementById("totalResult").innerText =
+                "TOTAL SCORE: " + total;
         }
 
     </script>
