@@ -36,51 +36,62 @@
         <br><br>
 
         <label>
+            Test Type:
+            <select id="testType">
+                <option value="major">Major (720)</option>
+                <option value="minor">Minor (400)</option>
+            </select>
+        </label>
+
+        <br><br>
+
+
+        <label>
             Physics Correct:
-            <input id="phyC" type="number">
+            <input id="phyC" type="number" min="0" max="45" required>
         </label>
         <br>
 
         <label>
             Physics Wrong:
-            <input id="phyW" type="number">
+            <input id="phyW" type="number" min="0" max="45" required>
         </label>
         <br><br>
 
         <label>
             Chemistry Correct:
-            <input id="chemC" type="number">
+            <input id="chemC" type="number" min="0" max="45" required>
         </label>
         <br>
 
         <label>
             Chemistry Wrong:
-            <input id="chemW" type="number">
+            <input id="chemW" type="number" min="0" max="45" required>
         </label>
 
         <br><br>
 
         <label>
             Botany Correct:
-            <input id="botC" type="number">
+            <input id="botC" type="number" min="0" max="45" required>
         </label>
         <br>
 
         <label>
             Botany Wrong:
-            <input id="botW" type="number">
+            <input id="botW" type="number" min="0" max="45" required>
         </label>
         <br><br>
 
         <label>
             Zoology Correct:
-            <input id="zooC" type="number">
+            <input id="zooC" type="number" min="0" max="45" required>
         </label>
         <br>
 
         <label>
             Zoology Wrong:
-            <input id="zooW" type="number">
+            <input id="zooW" type="number" min="0" max="45" required>
         </label>
 
 
@@ -89,6 +100,7 @@
         <p id="botResult"></p>
         <p id="zooResult"></p>
         <p id="totalResult"></p>
+        <p id="percentageResult"></p>
         <button onclick="calculatePhysics()">Calculate Physics</button>
         <button onclick="calculateChemistry()">Calculate Chemistry</button>
         <button onclick="calculateBotany()">Calculate Botany</button>
@@ -126,12 +138,11 @@
             );
         }
 
-        function showScreen(screenId) {
-            document.querySelectorAll(".screen").forEach(function (screen) {
-                screen.classList.remove("active");
-            });
-            document.getElementById(screenId).classList.add("active");
+        function getMaxMarks() {
+            const type = document.getElementById("testType").value;
+            return type === "minor" ? 400 : 720;
         }
+
 
         function calculatePhysics() {
             const phyC = Number(document.getElementById("phyC").value) || 0;
@@ -174,6 +185,21 @@
         }
 
         function calculateTotal() {
+            const fields = [
+                "phyC","phyW",
+                "chemC","chemW",
+                "botC","botW",
+                "zooC","zooW"
+            ];
+
+            for (let id of fields) {
+                if (document.getElementById(id).value === "") {
+                    document.getElementById("totalResult").innerText =
+                        "⚠️ Please fill all fields before calculating total.";
+                    return;
+                }
+            }
+
             const phyC = Number(document.getElementById("phyC").value) || 0;
             const phyW = Number(document.getElementById("phyW").value) || 0;
 
@@ -193,8 +219,15 @@
 
             const total = phyScore + chemScore + botScore + zooScore;
 
+            const maxMarks = getMaxMarks();
+
             document.getElementById("totalResult").innerText =
-                "TOTAL SCORE: " + total + " / 720";
+                "Total score: " + total + " / " + maxMarks;
+            
+            const percentage = (total / 720) * 100;
+
+            document.getElementById("percentageResult").innerText =
+                "Percentage: " + percentage.toFixed(2) + "%";
         }
         
     </script>
