@@ -350,10 +350,15 @@
 
                 logs.push(newTest);
                 localStorage.setItem("neetLogs", JSON.stringify(logs));
-                alert("✅ Test saved successfully");
 
+                // 👇 IMPORTANT: switch to viewing this saved test
+                currentViewingTest = newTest;
+                enterViewMode();
+
+                alert("✅ Test saved successfully");
                 return;
             }
+
             
             // Confirm before updating existing test
             const confirmUpdate = confirm(
