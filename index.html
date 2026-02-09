@@ -8,14 +8,16 @@
   <body>
     <!-- HOME SCREEN -->
     <div id="home" class="screen active">
-      <h1>NEET Calculator</h1>
-      <h2>What do you want to do?</h2>
-      <button onclick="startNewTest()">Calculate Marks</button>
-      <button onclick="showScreen('history')">View Previous Tests' Marks</button>
-      <button onclick="exportTests()">📤 Export Tests</button>
-      <button onclick="importTests()">📥 Import Tests</button>
-      <p>PS: Please don't clear your browser data.</p>
-      <p>The tests are saved locally in your browser.</p>
+      <div class="card">
+        <h1>NEET Calculator</h1>
+        <h2>What do you want to do?</h2>
+        <button onclick="startNewTest()">Calculate Marks</button>
+        <button onclick="showScreen('history')">View Previous Tests' Marks</button>
+        <button onclick="exportTests()">📤 Export Tests</button>
+        <button onclick="importTests()">📥 Import Tests</button>
+        <p>PS: Please don't clear your browser data.</p>
+        <p>The tests are saved locally in your browser.</p>
+      </div>  
     </div>
 
     <!-- CALCULATE SCREEN -->
