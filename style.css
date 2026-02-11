@@ -140,10 +140,13 @@ button {
 }
 
 #home button.primary:hover {
-  background: #f9fafb;
+  background: #374151;
 }
 
 #home button.primary:active {
   transform: scale(0.98);
 }
 
+.bold {
+  font-weight: bold;
+}
