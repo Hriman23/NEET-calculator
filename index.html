@@ -85,15 +85,18 @@
             </div>
         </div>
 
-        <p id="phyResult"></p>
-        <p id="chemResult"></p>
-        <p id="botResult"></p>
-        <p id="zooResult"></p>
-        <p id="totalResult"></p>
-        <p id="percentageResult"></p>
-        <p id="equivalentResult"></p>
-        <p id="metaInfo"></p>
-        <p id="remarkDisplay" style="display:none;"></p>
+        <div class="results-section">
+            <p id="phyResult"></p>
+            <p id="chemResult"></p>
+            <p id="botResult"></p>
+            <p id="zooResult"></p>
+            <p id="totalResult"></p>
+            <p id="percentageResult"></p>
+            <p id="equivalentResult"></p>
+            <p id="metaInfo"></p>
+            <p id="remarkDisplay" style="display:none;"></p>
+        </div>
+        
         <button onclick="calculatePhysics()">Get Physics Marks</button>
         <button onclick="calculateChemistry()">Get Chemistry Marks</button>
         <button onclick="calculateBotany()">Get Botany Marks</button>
@@ -119,6 +122,7 @@
     <!-- SCRIPTS -->
     <script>
         let currentViewingTest = null;
+        const DEV_MODE = true;
 
         function showScreen(screenId) {
             document.querySelectorAll(".screen").forEach(function (screen) {
@@ -451,8 +455,29 @@
             currentViewingTest = null;
             resetCalculateScreen();
             showScreen("calculate");
-        }
+            if (DEV_MODE) {
+                document.getElementById("testName").value = "Dev Test";
+                document.getElementById("testType").value = "minor";
 
+                document.getElementById("phyC").value = 20;
+                document.getElementById("phyW").value = 5;
+
+                document.getElementById("chemC").value = 22;
+                document.getElementById("chemW").value = 3;
+
+                document.getElementById("botC").value = 18;
+                document.getElementById("botW").value = 3;
+
+                document.getElementById("zooC").value = 22;
+                document.getElementById("zooW").value = 2;
+
+                calculatePhysics();
+                calculateChemistry();
+                calculateBotany();
+                calculateZoology();
+                calculateTotal();
+            }
+        }
 
         function resetCalculateScreen() {
             document.getElementById("remarkDisplay").style.display = "none";
@@ -606,7 +631,13 @@
 
             input.click();
         }
-  
+        
+        if (DEV_MODE) {
+            window.addEventListener("load", function () {
+                startNewTest();
+            });
+        }
+
     </script>
   </body>
 </html>
