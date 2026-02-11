@@ -7,7 +7,7 @@
 
   <body>
     <!-- HOME SCREEN -->
-    <div id="home" class="screen active">
+    <div id="home" class="screen">
       <div class="card">
         <h1>NEET Calculator</h1>
         <h2>What do you want to do?</h2>
@@ -26,79 +26,64 @@
     </div>
 
     <!-- CALCULATE SCREEN -->
-    <div id="calculate" class="screen">
+    <div id="calculate" class="screen active">
       <div class="card">
 
         <h2>Test Score Calculator</h2>
-        
-        <label>
-            Test Name:
-            <input id="testName" type="text" placeholder="Mastery 1.1 / AITS 5">
-        </label>
-        <br><br>
+        <h3>Let's get your scores calculated!</h3>
+        <div class="calc-section test-info">
 
-        <label id="editRemarkWrapper" style="display:none;">
-            Edit Remark:
-            <input id="editRemark" type="text"
-                placeholder="Why are you editing this test?">
-        </label>
+            <label>
+                Test Name:
+                <input id="testName" type="text" placeholder="Mastery 1.1 / AITS 5">
+            </label>
 
-        <label>
-            Test Type:
-            <select id="testType">
-                <option value="major">Major (720)</option>
-                <option value="minor">Minor (400)</option>
-            </select>
-        </label>
-        <br><br>
+            <label id="editRemarkWrapper" style="display:none;">
+                Edit Remark:
+                <input id="editRemark" type="text"
+                    placeholder="Why are you editing this test?">
+            </label>
 
-        <label>
-            Physics Correct:
-            <input id="phyC" type="number" min="0" max="45" required>
-        </label>
-        <br>
+            <label>
+                Test Type:
+                <select id="testType">
+                    <option value="major">Major (720)</option>
+                    <option value="minor">Minor (400)</option>
+                </select>
+            </label>
+        </div>
 
-        <label>
-            Physics Wrong:
-            <input id="phyW" type="number" min="0" max="45" required>
-        </label>
-        <br><br>
+        <div class="calc-section subjects">
+            <div class="subject-header">
+                <span></span>
+                <span>Correct</span>
+                <span>Wrong</span>
+            </div>
 
-        <label>
-            Chemistry Correct:
-            <input id="chemC" type="number" min="0" max="45" required>
-        </label>
-        <br>
+            <div class="subject-row">
+                <span class="subject-name">Physics</span>
+                <input id="phyC" type="number" min="0" max="45" required>
+                <input id="phyW" type="number" min="0" max="45" required>
+            </div>
 
-        <label>
-            Chemistry Wrong:
-            <input id="chemW" type="number" min="0" max="45" required>
-        </label>
+            <div class="subject-row">
+                <span class="subject-name">Chemistry</span>
+                <input id="chemC" type="number" min="0" max="45" required>
+                <input id="chemW" type="number" min="0" max="45" required>
+            </div>
 
-        <br><br>
+            <div class="subject-row">
+                <span class="subject-name">Botany</span>
+                <input id="botC" type="number" min="0" max="45" required>
+                <input id="botW" type="number" min="0" max="45" required>
+            </div>
 
-        <label>
-            Botany Correct:
-            <input id="botC" type="number" min="0" max="45" required>
-        </label>
-        <br>
-
-        <label>
-            Botany Wrong:
-            <input id="botW" type="number" min="0" max="45" required>
-        </label>
-        <br><br>
-
-        <label>
-            Zoology Correct:
-            <input id="zooC" type="number" min="0" max="45" required>
-        </label>
-        <br>
-
-        <label>
-            Zoology Wrong:
-            <input id="zooW" type="number" min="0" max="45" required>
-        </label>
+            <div class="subject-row">
+                <span class="subject-name">Zoology</span>
+                <input id="zooC" type="number" min="0" max="45" required>
+                <input id="zooW" type="number" min="0" max="45" required>
+            </div>
+        </div>
 
         <p id="phyResult"></p>
         <p id="chemResult"></p>
