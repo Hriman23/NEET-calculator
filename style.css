@@ -23,30 +23,29 @@ body {
    FONT ASSIGNMENTS
    ========================= */
 
-/* Title */
 h1 {
   font-family: 'Tac One', cursive;
 }
 
-/* Section headings */
 h2 {
   font-family: 'Pacifico', cursive;
 }
 
-/* Normal text */
+h3 {
+  font-family: 'Henny Penny', cursive;
+}
+
 body,
 label,
 p {
   font-family: 'Henny Penny', cursive;
 }
 
-/* Input + select text */
 input,
 select {
   font-family: 'Comic Neue', cursive;
 }
 
-/* Default buttons */
 button {
   font-family: 'Bungee', cursive;
 }
@@ -76,6 +75,14 @@ button {
 }
 
 /* =========================
+   TAGS CONFIGURATIONS
+   ========================= */
+
+.bold {
+  font-weight: bold;
+}
+
+/* =========================
    CARD LAYOUT
    ========================= */
 
@@ -83,10 +90,14 @@ button {
   background: #2fc87e;
   color: #081531;
   border-radius: 16px;
-  padding: 2px;
+  padding: 28px;
   max-width: 700px;
   margin: 40px auto;
 }
+
+/* =========================
+   HOME SCREEN STYLES
+   ========================= */
 
 #home .card {
   text-align: center;
@@ -145,6 +156,118 @@ button {
   transform: scale(0.98);
 }
 
-.bold {
-  font-weight: bold;
+/* =========================
+   CALCULATOR SCREEN STYLES
+   ========================= */
+
+#calculate h2 {
+  text-align: center;
 }
+
+#calculate h3 {
+  text-align: center;
+  margin-top: -12px;
+  margin-bottom: 24px;
+}
+
+#calculate .test-info label {
+  display: block;
+  margin-bottom: 16px;
+}
+
+/* Subjects Grid */
+/* ===== Subjects Table ===== */
+
+#calculate .subjects {
+  border: 2px solid rgba(8, 21, 49, 1);
+  padding: 0;
+  width: 100%;
+}
+
+#calculate .subject-header,
+#calculate .subject-row {
+  display: grid;
+  grid-template-columns: 0.7fr 1fr 1fr;
+}
+
+#calculate .subject-header {
+  font-weight: bold;
+  font-size: 1.7rem;
+  text-align: center;
+}
+
+#calculate .subject-header > *,
+#calculate .subject-row > * {
+  border-right: 1.5px solid rgba(8, 21, 49, 1);
+  border-bottom: 1.5px solid rgba(8, 21, 49, 1);
+  padding: 8px 10px;
+}
+
+#calculate .subject-header > *:last-child,
+#calculate .subject-row > *:last-child {
+  border-right: none;
+}
+
+#calculate .subject-name {
+  font-weight: bold;
+  font-size: 1.4rem;
+  text-align: center;
+}
+
+#calculate .subjects input {
+  width: 100%;
+  font-size: 1.2rem;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+#calculate h2 {
+  font-size: 3.5rem;
+  margin-bottom: 3px;
+}
+
+#calculate h3 {
+  font-size: 2rem;
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 18px;
+}
+
+#calculate .test-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+#calculate .test-info label {
+  display: flex;
+  flex-direction: column;
+  font-size: 1.7rem;
+}
+
+#calculate #editRemarkWrapper {
+  grid-column: 1 / -1;
+}
+
+#calculate .test-info input,
+#calculate .test-info select {
+  font-size: 1.1rem;
+  padding: 8px 10px;
+  border-radius: 8px;
+}
+
+/* =========================
+   RESULTS SECTION
+   ========================= */
+
+#calculate .results-section {
+  margin-top: 24px;
+}
+
+#calculate .results-section p {
+  margin: 6px 0;
+  font-size: 1.2rem;
+}
+
