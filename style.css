@@ -26,7 +26,6 @@ body {
 /* Title */
 h1 {
   font-family: 'Tac One', cursive;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 
 /* Section headings */
@@ -87,7 +86,6 @@ button {
   padding: 2px;
   max-width: 700px;
   margin: 40px auto;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.35);
 }
 
 #home .card {
@@ -150,3 +148,24 @@ button {
 .bold {
   font-weight: bold;
 }
+
+
+
+/* =========================
+   MOBILE SETTINGS
+   ========================= */
+
+@media (max-width: 600px) {
+  #home h1 {
+    font-size: 3.5rem;
+  }
+
+  #home h2 {
+    font-size: 1.8rem;
+  }
+
+  #home p {
+    font-size: 1rem;
+  }
+}
+   
