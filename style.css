@@ -148,24 +148,3 @@ button {
 .bold {
   font-weight: bold;
 }
-
-
-
-/* =========================
-   MOBILE SETTINGS
-   ========================= */
-
-@media (max-width: 600px) {
-  #home h1 {
-    font-size: 3.5rem;
-  }
-
-  #home h2 {
-    font-size: 1.8rem;
-  }
-
-  #home p {
-    font-size: 1rem;
-  }
-}
-   
