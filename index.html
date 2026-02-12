@@ -96,11 +96,7 @@
             <p id="metaInfo"></p>
             <p id="remarkDisplay" style="display:none;"></p>
         </div>
-        
-        <button onclick="calculatePhysics()">Get Physics Marks</button>
-        <button onclick="calculateChemistry()">Get Chemistry Marks</button>
-        <button onclick="calculateBotany()">Get Botany Marks</button>
-        <button onclick="calculateZoology()">Get Zoology Marks</button>
+
         <button onclick="calculateTotal()">Get Total Marks</button>
         <button onclick="saveTest()" id="saveBtn">Save Score</button>
 
@@ -122,7 +118,8 @@
     <!-- SCRIPTS -->
     <script>
         let currentViewingTest = null;
-        const DEV_MODE = true;
+        const DEV_MODE = false; // Set to true to enable auto-filled test for faster development
+        let liveCalculationEnabled = false;
 
         function showScreen(screenId) {
             document.querySelectorAll(".screen").forEach(function (screen) {
@@ -245,6 +242,8 @@
         }
 
         function calculateTotal() {
+            liveCalculationEnabled = true;
+
             const fields = [
                 "phyC","phyW",
                 "chemC","chemW",
@@ -258,6 +257,31 @@
                         "⚠️ Please fill all fields before calculating total.";
                     return;
                 }
+            }
+
+            // 🔁 Update individual subject results
+            calculatePhysics();
+            calculateChemistry();
+            calculateBotany();
+            calculateZoology();
+
+            // 🚫 Stop total calculation if any subject exceeded max questions
+            const errorExists = [
+                "phyResult",
+                "chemResult",
+                "botResult",
+                "zooResult"
+            ].some(id =>
+                document.getElementById(id).innerText.includes("cannot exceed")
+            );
+
+            if (errorExists) {
+                document.getElementById("totalResult").innerText =
+                    "❌ Fix subject errors before calculating total.";
+
+                document.getElementById("percentageResult").innerText = "";
+                document.getElementById("equivalentResult").innerText = "";
+                return;
             }
 
             const phyC = Number(document.getElementById("phyC").value) || 0;
@@ -421,10 +445,6 @@
 
             showScreen("calculate");
 
-            calculatePhysics();
-            calculateChemistry();
-            calculateBotany();
-            calculateZoology();
             calculateTotal();
 
             const created = new Date(log.createdAt).toLocaleString();
@@ -452,6 +472,8 @@
         }
 
         function startNewTest() {
+            liveCalculationEnabled = false;
+            
             currentViewingTest = null;
             resetCalculateScreen();
             showScreen("calculate");
@@ -471,15 +493,13 @@
                 document.getElementById("zooC").value = 22;
                 document.getElementById("zooW").value = 2;
 
-                calculatePhysics();
-                calculateChemistry();
-                calculateBotany();
-                calculateZoology();
                 calculateTotal();
             }
         }
 
         function resetCalculateScreen() {
+            liveCalculationEnabled = false;
+
             document.getElementById("remarkDisplay").style.display = "none";
 
             // Clear inputs
@@ -513,9 +533,10 @@
 
             // Hide calculate + save/update buttons
             document.getElementById("saveBtn").style.display = "none";
-            document.querySelectorAll(
-                "button[onclick^='calculate']"
-            ).forEach(btn => btn.style.display = "none");
+            document.querySelector(
+                "button[onclick='calculateTotal()']"
+            ).style.display = "none";
+
 
             // Show view-mode buttons
             document.getElementById("editBtn").style.display = "inline-block";
@@ -529,9 +550,9 @@
 
             // Show calculate + save/update buttons
             document.getElementById("saveBtn").style.display = "inline-block";
-            document.querySelectorAll(
-                "button[onclick^='calculate']"
-            ).forEach(btn => btn.style.display = "inline-block");
+            document.querySelector(
+                "button[onclick='calculateTotal()']"
+            ).style.display = "inline-block";
 
             // Hide view-mode buttons
             document.getElementById("editBtn").style.display = "none";
@@ -632,6 +653,35 @@
             input.click();
         }
         
+        // 🔄 Live calculation on input change
+        document.querySelectorAll(
+            "#phyC, #phyW, #chemC, #chemW, #botC, #botW, #zooC, #zooW, #testType"
+        ).forEach(input => {
+            input.addEventListener("input", function () {
+
+                // Enable auto-update if:
+                // 1. Editing existing test
+                // 2. OR button has been clicked once in new test
+                if (currentViewingTest === null && !liveCalculationEnabled) return;
+
+                const fields = [
+                    "phyC","phyW",
+                    "chemC","chemW",
+                    "botC","botW",
+                    "zooC","zooW"
+                ];
+
+                const allFilled = fields.every(id =>
+                    document.getElementById(id).value !== ""
+                );
+
+                if (allFilled) {
+                    calculateTotal();
+                }
+            });
+
+        });
+
         if (DEV_MODE) {
             window.addEventListener("load", function () {
                 startNewTest();
