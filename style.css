@@ -182,6 +182,7 @@ button {
   border: 2px solid rgba(8, 21, 49, 1);
   padding: 0;
   width: 100%;
+  border-radius: 8px;
 }
 
 #calculate .subject-header,
@@ -264,6 +265,9 @@ button {
 
 #calculate .results-section {
   margin-top: 24px;
+  border: 2px solid rgba(8, 21, 49, 1);
+  padding: 16px 18px;
+  border-radius: 8px;
 }
 
 #calculate .results-section p {
@@ -274,10 +278,114 @@ button {
 /* ===== Results Grid Layout ===== */
 #calculate .results-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 0.9fr 1.1fr;
   gap: 24px;
 }
 
 #calculate results-meta {
   margin-top: 16px;
+}
+
+/* ===== Results Hierarchy ===== */
+#calculate .results-right #totalResult {
+  font-size: 1.7rem;
+  font-weight: bold;
+}
+
+#calculate .results-right #percentageResult {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+#calculate .results-right #equivalentResult {
+  font-size: 1.25rem;
+  opacity: 0.9;
+}
+
+#calculate .results-left p {
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+/* ===== Results Structuce Polish ===== */
+
+#calculate .results-left p {
+  margin: 8px 0;
+}
+
+#calculate .results-right {
+  padding-left: 10px;
+  border-left: 2px solid rgba(8, 21, 49, 0.3);
+}
+
+/* =========================
+   ACTION BUTTONS LAYOUT
+   ========================= */
+
+#calculate .action-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 22px;
+}
+
+#calculate .action-buttons button {
+  padding: 16px 14px;
+  font-size: 1.3rem;
+  letter-spacing: 0.5px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+}
+
+/* =========================
+   BUTTON COLOR HIERARCHY
+   ========================= */
+
+/* Primary — Save */
+#calculate .btn-primary {
+  background: #081531;
+  color: #ffffff;
+}
+
+#calculate .btn-primary:hover {
+  background: #0f2147;
+}
+
+/* Danger — Delete */
+#calculate .btn-danger {
+  background: #b91c1c;
+  color: #ffffff;
+}
+
+#calculate .btn-danger:hover {
+  background: #991b1b;
+}
+
+/* Neutral — Back */
+#calculate .btn-neutral {
+  background: #e5e7eb;
+  color: #081531;
+  grid-column: 1 / -1;     /* span full row */
+  width: 100%;
+  justify-self: center;    /* center horizontally */
+}
+
+#calculate .btn-neutral:hover {
+  background: #d1d5db;
+}
+
+/* Outline — Edit */
+#calculate .btn-outline {
+  background: #f9fafb;
+  color: #081531;
+  border: none;
+}
+
+#calculate .btn-outline:hover {
+  background: #e5e7eb;
+}
+
+#calculate .action-buttons button:active {
+  transform: scale(0.98);
 }

@@ -110,14 +110,17 @@
         
         </div>
 
-        <button onclick="calculateTotal()">Get Total Marks</button>
-        <button onclick="saveTest()" id="saveBtn">Save Score</button>
+        <div class="action-buttons">
+            <button class="btn-primary" onclick="calculateTotal()">Get Total Marks</button>
 
-        <!-- VIEW MODE BUTTONS -->
-        <button onclick="enterEditMode()" id="editBtn">✏️ Edit</button>
-        <button onclick="deleteCurrentTest()" id="deleteBtn">🗑️ Delete</button>
-        
-        <button onclick="showScreen('home')">⬅ Back</button>
+            <button class="btn-primary" onclick="saveTest()" id="saveBtn">Save Score</button>
+
+            <button class="btn-outline" onclick="enterEditMode()" id="editBtn">✏️ Edit</button>
+
+            <button class="btn-danger" onclick="deleteCurrentTest()" id="deleteBtn">🗑️ Delete</button>
+
+            <button class="btn-neutral" onclick="showScreen('home')">⬅ Back</button>
+        </div>
       </div>
     </div>
 
