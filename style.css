@@ -1,3 +1,5 @@
+/* -- TRYING OUT FOR VIEWMODE = PRINT MODE -- */
+
 /* =========================
    GOOGLE FONTS
    ========================= */
@@ -393,4 +395,49 @@ button {
 /* =========================
               U4
    ========================= */
+
+/* ===== U4 View Mode Foundation ===== */
+
+#calculate .cell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+#calculate .view-value {
+  display: none;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+/* Center printed report values */
+#calculate.view-mode .cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#calculate.view-mode .view-value {
+  text-align: center;
+  width: 100%;
+}
+
+/* ===== U4 View Mode Display Rules ===== */
+
+#calculate.view-mode .cell input {
+  display: none;
+}
+
+#calculate.view-mode .view-value {
+  display: block;
+}
+
+/* Ensure inputs fill full grid cell in edit mode */
+#calculate .cell input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+
 
