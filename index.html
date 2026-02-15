@@ -174,22 +174,27 @@
         let liveCalculationEnabled = false;
 
         function showScreen(screenId) {
-            // Remember current active screen before switching
+
             const currentActive = document.querySelector(".screen.active");
+
             if (currentActive) {
                 lastScreen = currentActive.id;
+
+                // Remove active to trigger fade-out
+                currentActive.classList.remove("active");
+
+                // Wait for transition to finish before switching
+                setTimeout(() => {
+                    document.getElementById(screenId).classList.add("active");
+                }, 300);
+
+            } else {
+                document.getElementById(screenId).classList.add("active");
             }
 
-            document.querySelectorAll(".screen").forEach(function (screen) {
-                screen.classList.remove("active");
-            });
-            document.getElementById(screenId).classList.add("active");
-
-            // 🆕 If creating a new test, start in EDIT mode
             if (screenId === "calculate" && currentViewingTest === null) {
                 enterEditMode();
             }
-
 
             if (screenId === "history") {
                 loadHistory();
