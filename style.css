@@ -439,5 +439,14 @@ button {
   box-sizing: border-box;
 }
 
+/* ===== Mode Transition Animation ===== */
 
+#calculate .card {
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+#calculate.mode-transition .card {
+  opacity: 0.7;
+  transform: translateY(6px);
+}
 

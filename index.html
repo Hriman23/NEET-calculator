@@ -605,6 +605,10 @@
         }
 
         function enterViewMode() {
+            const calc = document.getElementById("calculate");
+            calc.classList.add("mode-transition");
+            setTimeout(() => calc.classList.remove("mode-transition"), 200);
+            
             // Activate report mode
             document.getElementById("calculate").classList.add("view-mode");
 
@@ -637,6 +641,10 @@
         }
 
         function enterEditMode() {
+            const calc = document.getElementById("calculate");
+            calc.classList.add("mode-transition");
+            setTimeout(() => calc.classList.remove("mode-transition"), 200);
+
             // Remove report mode
             document.getElementById("calculate").classList.remove("view-mode");
 
