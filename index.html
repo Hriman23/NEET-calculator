@@ -1,3 +1,4 @@
+<!-- TRYING OUT FOR VIEWMODE = PRINT MODE --> 
 <!DOCTYPE html>
 <html>
   <head>
@@ -62,26 +63,58 @@
 
             <div class="subject-row">
                 <span class="subject-name">Physics</span>
-                <input id="phyC" type="number" min="0" max="45" required>
-                <input id="phyW" type="number" min="0" max="45" required>
+
+                <div class="cell">
+                    <input id="phyC" type="number" min="0" max="45" required>
+                    <span class="view-value" id="phyC_view"></span>
+                </div>
+
+                <div class="cell">
+                    <input id="phyW" type="number" min="0" max="45" required>
+                    <span class="view-value" id="phyW_view"></span>
+                </div>
             </div>
 
             <div class="subject-row">
                 <span class="subject-name">Chemistry</span>
-                <input id="chemC" type="number" min="0" max="45" required>
-                <input id="chemW" type="number" min="0" max="45" required>
+
+                <div class="cell">
+                    <input id="chemC" type="number" min="0" max="45" required>
+                    <span class="view-value" id="chemC_view"></span>
+                </div>
+
+                <div class="cell">
+                    <input id="chemW" type="number" min="0" max="45" required>
+                    <span class="view-value" id="chemW_view"></span>
+                </div>
             </div>
 
             <div class="subject-row">
                 <span class="subject-name">Botany</span>
-                <input id="botC" type="number" min="0" max="45" required>
-                <input id="botW" type="number" min="0" max="45" required>
+
+                <div class="cell">
+                    <input id="botC" type="number" min="0" max="45" required>
+                    <span class="view-value" id="botC_view"></span>
+                </div>
+
+                <div class="cell">
+                    <input id="botW" type="number" min="0" max="45" required>
+                    <span class="view-value" id="botW_view"></span>
+                </div>
             </div>
 
             <div class="subject-row">
                 <span class="subject-name">Zoology</span>
-                <input id="zooC" type="number" min="0" max="45" required>
-                <input id="zooW" type="number" min="0" max="45" required>
+
+                <div class="cell">
+                    <input id="zooC" type="number" min="0" max="45" required>
+                    <span class="view-value" id="zooC_view"></span>
+                </div>
+
+                <div class="cell">
+                    <input id="zooW" type="number" min="0" max="45" required>
+                    <span class="view-value" id="zooW_view"></span>
+                </div>
             </div>
         </div>
 
@@ -119,7 +152,9 @@
 
             <button class="btn-danger" onclick="deleteCurrentTest()" id="deleteBtn">🗑️ Delete</button>
 
-            <button class="btn-neutral" onclick="showScreen('home')">⬅ Back</button>
+            <button class="btn-neutral" onclick="handleBack()">⬅ Back</button>
+
+            <button class="btn-neutral" onclick="showScreen('home')">🏠 Home</button>
         </div>
       </div>
     </div>
@@ -134,10 +169,17 @@
     <!-- SCRIPTS -->
     <script>
         let currentViewingTest = null;
+        let lastScreen = "home";
         const DEV_MODE = true; // Set to true to enable auto-filled test for faster development
         let liveCalculationEnabled = false;
 
         function showScreen(screenId) {
+            // Remember current active screen before switching
+            const currentActive = document.querySelector(".screen.active");
+            if (currentActive) {
+                lastScreen = currentActive.id;
+            }
+
             document.querySelectorAll(".screen").forEach(function (screen) {
                 screen.classList.remove("active");
             });
@@ -152,6 +194,21 @@
             if (screenId === "history") {
                 loadHistory();
             }
+        }
+
+        function handleBack() {
+
+            // If editing an existing test → go back to its View Mode
+            if (currentViewingTest !== null &&
+                document.getElementById("calculate").classList.contains("active") &&
+                !document.getElementById("calculate").classList.contains("view-mode")) {
+
+                enterViewMode();
+                return;
+            }
+
+            // Otherwise go to previous screen
+            showScreen(lastScreen);
         }
 
         function readInputs() {
@@ -543,6 +600,21 @@
         }
 
         function enterViewMode() {
+            // Activate report mode
+            document.getElementById("calculate").classList.add("view-mode");
+
+            // Copy input values into view spans
+            [
+                "phyC","phyW",
+                "chemC","chemW",
+                "botC","botW",
+                "zooC","zooW"
+            ].forEach(id => {
+                const input = document.getElementById(id);
+                const span = document.getElementById(id + "_view");
+                if (span) span.innerText = input.value;
+            });
+            
             // Lock inputs
             document.querySelectorAll("#calculate input, #calculate select")
                 .forEach(el => el.disabled = true);
@@ -560,6 +632,9 @@
         }
 
         function enterEditMode() {
+            // Remove report mode
+            document.getElementById("calculate").classList.remove("view-mode");
+
             // Unlock inputs
             document.querySelectorAll("#calculate input, #calculate select")
                 .forEach(el => el.disabled = false);
