@@ -433,6 +433,20 @@ button {
   display: block;
 }
 
+/* Hide header inputs in view mode */
+#calculate.view-mode #testName,
+#calculate.view-mode #testType {
+  display: none;
+}
+
+/* Bigger printed values for Test Name & Type */
+#calculate .test-info .view-value {
+  font-size: 1.65rem;     /* match select/input visual weight */
+  font-weight: 600;
+  text-align: left;
+  margin-top: 6px;
+}
+
 /* Ensure inputs fill full grid cell in edit mode */
 #calculate .cell input {
   width: 100%;
