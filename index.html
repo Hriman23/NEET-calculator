@@ -167,6 +167,19 @@
             <h2>Your Saved Tests</h2>
             <p>Here you can view, edit or delete your previously saved tests.</p>
             <p>Total tests saved: <span id="historyCount"></span></p>
+
+            <div class="history-controls">
+                <select id="historyFilter">
+                    <option value="all">All Tests</option>
+                    <option value="major">Major (720)</option>
+                    <option value="minor">Minor (400)</option>
+                </select>
+
+                <input 
+                    type="text" 
+                    id="historySearch" 
+                    placeholder="Search test name (e.g., Mastery, AITS)">
+            </div>
             
             <div id="historyList"></div>
             
@@ -507,7 +520,30 @@
                 return;
             }
 
-            logs.forEach((log) => {
+            // Apply filter
+            const selectedFilter = document.getElementById("historyFilter")?.value || "all";
+            const searchQuery = document.getElementById("historySearch")?.value.toLowerCase() || "";
+
+            // Filter by type
+            let filteredLogs = logs;
+
+            if (selectedFilter !== "all") {
+                filteredLogs = filteredLogs.filter(log => log.testType === selectedFilter);
+            }
+
+            // Filter by search (test name only)
+            if (searchQuery.trim() !== "") {
+                filteredLogs = filteredLogs.filter(log =>
+                    log.testName.toLowerCase().includes(searchQuery)
+                );
+            }
+
+            if (filteredLogs.length === 0) {
+                list.innerText = "No matching tests found.";
+                return;
+            }
+
+            filteredLogs.forEach((log) => {
                 const btn = document.createElement("button");
 
                 const date = new Date(log.createdAt).toLocaleDateString();
@@ -524,6 +560,7 @@
                 btn.onclick = function () {
                     openSavedTest(log);
                 };
+
                 list.appendChild(btn);
             });
         }
@@ -819,6 +856,9 @@
             });
 
         });
+
+        document.getElementById("historyFilter")?.addEventListener("change", loadHistory);
+        document.getElementById("historySearch")?.addEventListener("input", loadHistory);
 
         if (DEV_MODE) {
             window.addEventListener("load", function () {
