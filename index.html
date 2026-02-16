@@ -166,7 +166,11 @@
         <div class="card">
             <h2>Previous Test Logs</h2>
             <div id="historyList"></div>
-            <button onclick="showScreen('home')">⬅ Back</button>
+            
+            <div class="action-buttons history-actions">
+                <button class="btn-neutral" onclick="showScreen('home')">⬅ Back</button>
+                <button class="btn-neutral" onclick="showScreen('home')">🏠 Home</button>
+            </div>
         </div>
     </div>
 
@@ -174,7 +178,7 @@
     <script>
         let currentViewingTest = null;
         let lastScreen = "home";
-        const DEV_MODE = false; // Set to true to enable auto-filled test for faster development
+        const DEV_MODE = true; // Set to true to enable auto-filled test for faster development
         let liveCalculationEnabled = false;
 
         function showScreen(screenId) {
@@ -498,7 +502,15 @@
 
                 const date = new Date(log.createdAt).toLocaleDateString();
 
-                btn.innerText = log.testName + " (" + date + ")";
+                const typeLabel = log.testType === "minor" ? "Minor (400)" : "Major (720)";
+
+                btn.innerHTML = `
+                    <div class="history-title">${log.testName}</div>
+                    <div class="history-meta">
+                        ${typeLabel} • v${log.version} • ${date}
+                    </div>
+                `;
+
                 btn.onclick = function () {
                     openSavedTest(log);
                 };
@@ -800,7 +812,7 @@
 
         if (DEV_MODE) {
             window.addEventListener("load", function () {
-                startNewTest();
+                showScreen("history");
             });
         }
 
