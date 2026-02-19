@@ -8,7 +8,7 @@
 
   <body>
     <!-- HOME SCREEN -->
-    <div id="home" class="screen">
+    <div id="home" class="screen active">
       <div class="card">
         <h1>NEET Calculator</h1>
         <h2>What do you want to do?</h2>
@@ -139,8 +139,12 @@
             </div>
             
             <div class="results-meta">
-                <p id="metaInfo"></p>
-                <p id="remarkDisplay" style="display:none;"></p>
+                <div id="metadataBlock">
+                    <p id="remarkLine" style="display:none;"></p>
+                    <p id="metaLine1"></p>
+                    <p id="metaLine2"></p>
+                    <p id="metaLine3"></p>
+                </div>
             </div>
         
         </div>
@@ -154,6 +158,10 @@
 
             <button class="btn-danger" onclick="deleteCurrentTest()" id="deleteBtn">🗑️ Delete</button>
 
+            <button class="btn-outline" onclick="archiveCurrentTest()" id="archiveBtn">📦 Archive</button>
+
+            <button class="btn-outline" onclick="duplicateCurrentTest()" id="duplicateBtn">📄 Duplicate</button>
+
             <button class="btn-neutral" onclick="handleBack()">⬅ Back</button>
 
             <button class="btn-neutral" onclick="showScreen('home')">🏠 Home</button>
@@ -162,30 +170,104 @@
     </div>
 
     <!-- HISTORY SCREEN -->
-    <div id="history" class="screen active">
+    <div id="history" class="screen">
         <div class="card">
             <h2>Your Saved Tests</h2>
+
+            <hr class="history-divider">
+            
             <p>Here you can view, edit or delete your previously saved tests.</p>
+
+            <hr class="history-divider">
+
             <p>Total tests saved: <span id="historyCount"></span></p>
 
+            <hr class="history-divider">
+
             <div class="history-controls">
+                <select id="historySort">
+                    <option value="created_desc">Created (Newest)</option>
+                    <option value="created_asc">Created (Oldest)</option>
+                    <option value="updated_desc">Updated (Newest)</option>
+                    <option value="version_desc">Version (Highest)</option>
+                </select>
+                
                 <select id="historyFilter">
                     <option value="all">All Tests</option>
                     <option value="major">Major (720)</option>
                     <option value="minor">Minor (400)</option>
                 </select>
 
+                <div class="controls-divider"></div>
+
                 <input 
                     type="text" 
                     id="historySearch" 
                     placeholder="Search test name (e.g., Mastery, AITS)">
             </div>
+
+            <hr class="history-divider">
             
             <div id="historyList"></div>
+
+            <hr class="history-divider">
             
             <div class="action-buttons history-actions">
-                <button class="btn-neutral" onclick="showScreen('home')">⬅ Back</button>
-                <button class="btn-neutral" onclick="showScreen('home')">🏠 Home</button>
+
+                <button 
+                    class="btn-outline" 
+                    id="selectAllBtn"
+                    onclick="selectAllVisible()"
+                    style="display:none;">
+                    Select All
+                </button>
+
+                <button 
+                    class="btn-outline" 
+                    id="selectNoneBtn"
+                    onclick="selectNone()"
+                    style="display:none;">
+                    Select None
+                </button>
+
+                <button 
+                    class="btn-danger" 
+                    id="deleteModeBtn"
+                    onclick="toggleDeleteMode()">
+                    🗑 Delete
+                </button>
+
+                <button 
+                    class="btn-danger" 
+                    id="deleteSelectedBtn"
+                    onclick="deleteSelectedTests()"
+                    style="display:none;">
+                    Delete Selected
+                </button>
+
+                <button 
+                    class="btn-outline" 
+                    id="archiveModeBtn"
+                    onclick="toggleArchiveMode()">
+                    📦 Archive
+                </button>
+
+                <button 
+                    class="btn-outline" 
+                    id="archiveSelectedBtn"
+                    onclick="archiveSelectedTests()"
+                    style="display:none;">
+                    Archive Selected
+                </button>
+
+                <button class="btn-neutral" id="historyBackBtn" onclick="handleHistoryBack()">
+                    ⬅ Back
+                </button>
+
+                <button class="btn-neutral" id="historyHomeBtn" onclick="showScreen('home')">
+                    🏠 Home
+                </button>
+
             </div>
         </div>
     </div>
@@ -196,6 +278,12 @@
         let lastScreen = "home";
         const DEV_MODE = true; // Set to true to enable auto-filled test for faster development
         let liveCalculationEnabled = false;
+        let deleteModeActive = false;
+        let selectedForDeletion = new Set();
+        let archiveModeActive = false;
+        let selectedForArchive = new Set();
+        let archiveSelectionType = null; // "active" or "archived"
+        let archiveExpanded = false;
 
         function showScreen(screenId) {
 
@@ -227,29 +315,30 @@
 
         function handleBack() {
 
-            // If editing an existing test → go back to its View Mode
-            if (currentViewingTest !== null &&
-                document.getElementById("calculate").classList.contains("active") &&
-                !document.getElementById("calculate").classList.contains("view-mode")) {
+            const calculateScreen = document.getElementById("calculate");
 
+            // If editing existing test → go back to View Mode
+            if (
+                currentViewingTest !== null &&
+                calculateScreen.classList.contains("active") &&
+                !calculateScreen.classList.contains("view-mode")
+            ) {
                 enterViewMode();
                 return;
             }
 
-            // Otherwise go to previous screen
+            // If viewing a saved test → always go to history
+            if (
+                currentViewingTest !== null &&
+                calculateScreen.classList.contains("active") &&
+                calculateScreen.classList.contains("view-mode")
+            ) {
+                showScreen("history");
+                return;
+            }
+
+            // Otherwise normal back behavior
             showScreen(lastScreen);
-        }
-
-        function readInputs() {
-            const name = document.getElementById("testName").value;
-            const phyC = document.getElementById("phyC").value;
-            const phyW = document.getElementById("phyW").value;
-
-            alert(
-                "Test: " + name +
-                "\nPhysics Correct: " + phyC +
-                "\nPhysics Wrong: " + phyW
-            );
         }
 
         function getMaxMarks() {
@@ -452,6 +541,7 @@
                     version: 1,
                     createdAt: now,
                     updatedAt: now,
+                    archived: false,
                     rawData
                 };
 
@@ -497,6 +587,8 @@
 
             localStorage.setItem("neetLogs", JSON.stringify(logs));
             currentViewingTest = logs[index];
+            
+            openSavedTest(currentViewingTest);
 
             alert("🔄 Test updated successfully");
         }
@@ -508,15 +600,34 @@
 
             let logs = JSON.parse(localStorage.getItem("neetLogs")) || [];
 
-            // Always sort by createdAt (newest first)
-            logs = logs.slice().sort((a, b) => 
-                new Date(b.createdAt) - new Date(a.createdAt)
-            );
+            // Apply selected sort
+            const selectedSort = document.getElementById("historySort")?.value || "created_desc";
+
+            logs = logs.slice().sort((a, b) => {
+
+                switch (selectedSort) {
+
+                    case "created_asc":
+                        return new Date(a.createdAt) - new Date(b.createdAt);
+
+                    case "updated_desc":
+                        return new Date(b.updatedAt) - new Date(a.updatedAt);
+
+                    case "version_desc":
+                        return b.version - a.version;
+
+                    case "created_desc":
+                    default:
+                        return new Date(b.createdAt) - new Date(a.createdAt);
+                }
+            });
             
             document.getElementById("historyCount").innerText = logs.length;
 
             if (logs.length === 0) {
-                list.innerText = "No saved tests yet.";
+                list.innerHTML = `<div class="history-empty">
+                    No saved tests yet.
+                </div>`;
                 return;
             }
 
@@ -539,31 +650,545 @@
             }
 
             if (filteredLogs.length === 0) {
-                list.innerText = "No matching tests found.";
+                list.innerHTML = `<div class="history-empty">
+                    No matching tests found.
+                </div>`;
                 return;
             }
 
-            filteredLogs.forEach((log) => {
-                const btn = document.createElement("button");
+            // 🔹 Split Active & Archived
+            const activeLogs = filteredLogs.filter(log => !log.archived);
+            const archivedLogs = filteredLogs.filter(log => log.archived === true);
 
-                const date = new Date(log.createdAt).toLocaleDateString();
-
-                const typeLabel = log.testType === "minor" ? "Minor (400)" : "Major (720)";
-
-                btn.innerHTML = `
-                    <div class="history-title">${log.testName}</div>
-                    <div class="history-meta">
-                        ${typeLabel} • v${log.version} • ${date}
-                    </div>
-                `;
-
-                btn.onclick = function () {
-                    openSavedTest(log);
-                };
-
-                list.appendChild(btn);
+            // 🔹 Render Active Tests
+            activeLogs.forEach(log => {
+                renderHistoryCard(log);
             });
+
+            // 🔹 Render Archived Section (only if exists)
+            if (archivedLogs.length > 0) {
+
+                const sectionDivider = document.createElement("hr");
+                sectionDivider.className = "history-divider";
+                sectionDivider.style.gridColumn = "1 / -1";
+                sectionDivider.style.margin = "0";
+                list.appendChild(sectionDivider);
+
+                const archiveToggle = document.createElement("button");
+                archiveToggle.innerText = `Archived (${archivedLogs.length}) ${archiveExpanded ? "▲" : "▼"}`;
+                archiveToggle.className = "archive-toggle";
+                archiveToggle.onclick = function () {
+                    archiveExpanded = !archiveExpanded;
+                    loadHistory();
+                };
+                list.appendChild(archiveToggle);
+
+                if (archiveExpanded) {
+                    archivedLogs.forEach(log => {
+                        renderHistoryCard(log, true);
+                    });
+                }
+            }
         }
+
+        function renderHistoryCard(log, isArchived = false) {
+
+            const list = document.getElementById("historyList");
+
+            const btn = document.createElement("button");
+
+            const date = new Date(log.createdAt).toLocaleDateString();
+            const typeLabel = log.testType === "minor" ? "Minor (400)" : "Major (720)";
+
+            btn.innerHTML = `
+                <div class="history-card-top">
+
+                    ${(deleteModeActive || archiveModeActive) ? `
+                        <input 
+                            type="checkbox"
+                            class="delete-checkbox"
+                            ${(deleteModeActive
+                                ? selectedForDeletion.has(log.id)
+                                : selectedForArchive.has(log.id)
+                            ) ? "checked" : ""}
+                        />
+                    ` : ""}
+
+                    <div class="history-title">${log.testName}</div>
+
+                    <div class="history-card-actions">
+                        ${log.imported ? `<span class="import-badge">IMPORTED</span>` : ""}
+                        ${log.duplicated ? `<span class="duplicate-badge">DUPLICATED</span>` : ""}
+                    </div>
+                </div>
+
+                <div class="history-meta">
+                    ${typeLabel} • v${log.version} • ${date}
+                </div>
+            `;
+
+            if (isArchived) {
+                btn.classList.add("archived-card");
+            }
+
+            // Apply selection highlight based on state
+            if (deleteModeActive && selectedForDeletion.has(log.id)) {
+                btn.classList.add("selected-card");
+            }
+
+            if (archiveModeActive && selectedForArchive.has(log.id)) {
+                btn.classList.add("selected-card");
+            }
+
+            btn.onclick = function () {
+
+                // DELETE MODE
+                if (deleteModeActive) {
+                    const checkbox = btn.querySelector(".delete-checkbox");
+
+                    if (selectedForDeletion.has(log.id)) {
+                        selectedForDeletion.delete(log.id);
+                        btn.classList.remove("selected-card");
+                        if (checkbox) checkbox.checked = false;
+                    } else {
+                        selectedForDeletion.add(log.id);
+                        btn.classList.add("selected-card");
+                        if (checkbox) checkbox.checked = true;
+                    }
+
+                    updateDeleteButtonLabel();
+                    return;
+                }
+
+                // ARCHIVE MODE
+                if (archiveModeActive) {
+                    const checkbox = btn.querySelector(".delete-checkbox");
+                    const currentType = log.archived ? "archived" : "active";
+
+                    // First selection defines type
+                    if (selectedForArchive.size === 0) {
+
+                        archiveSelectionType = currentType;
+                        selectedForArchive.add(log.id);
+                        btn.classList.add("selected-card");
+                        if (checkbox) checkbox.checked = true;
+                        updateArchiveButtonLabel();
+                        return;
+                    }
+
+                    // If selecting different type → block
+                    if (archiveSelectionType !== currentType) {
+                        alert("You can only select active OR archived tests at a time.");
+                        return;
+                    }
+
+                    // Toggle selection
+                    if (selectedForArchive.has(log.id)) {
+                        selectedForArchive.delete(log.id);
+                        btn.classList.remove("selected-card");
+                        if (checkbox) checkbox.checked = false;
+
+                        if (selectedForArchive.size === 0) {
+                            archiveSelectionType = null;
+                        }
+
+                    } else {
+                        selectedForArchive.add(log.id);
+                        btn.classList.add("selected-card");
+                        if (checkbox) checkbox.checked = true;
+                    }
+
+                    updateArchiveButtonLabel();
+
+                    return;
+                }
+
+                // NORMAL MODE
+                openSavedTest(log);
+            };
+
+            list.appendChild(btn);
+        }
+
+        function handleHistoryBack() {
+            const searchInput = document.getElementById("historySearch");
+            const filterSelect = document.getElementById("historyFilter");
+
+            const hasSearch = searchInput.value.trim() !== "";
+            const hasFilter = filterSelect.value !== "all";
+
+            if (hasSearch || hasFilter) {
+                searchInput.value = "";
+                filterSelect.value = "all";
+                loadHistory();
+                return;
+            }
+
+            showScreen("home");
+        }
+
+        function deleteCurrentTest() {
+            if (!currentViewingTest) {
+                alert("❌ No test selected to delete.");
+                return;
+            }
+
+            const confirmDelete = confirm(
+                `Delete "${currentViewingTest.testName}"?\nThis cannot be undone.`
+            );
+
+            if (!confirmDelete) return;
+
+            const logs = JSON.parse(localStorage.getItem("neetLogs")) || [];
+
+            const updatedLogs = logs.filter(
+                log => log.id !== currentViewingTest.id
+            );
+
+            localStorage.setItem("neetLogs", JSON.stringify(updatedLogs));
+
+            currentViewingTest = null;
+
+            resetCalculateScreen();
+            showScreen("history");
+
+            alert("🗑️ Test deleted");
+        }
+
+        function duplicateCurrentTest() {
+
+            if (!currentViewingTest) {
+                alert("❌ No test selected to duplicate.");
+                return;
+            }
+
+            const logs = JSON.parse(localStorage.getItem("neetLogs")) || [];
+            const now = new Date().toISOString();
+
+            const newTest = {
+                id: Date.now(),
+                testName: currentViewingTest.testName,
+                testType: currentViewingTest.testType,
+                version: 1,
+                createdAt: now,
+                updatedAt: now,
+                editRemark: currentViewingTest.editRemark || "",
+                duplicated: true,
+                duplicatedAt: now,
+                archived: false,
+                rawData: { ...currentViewingTest.rawData }
+            };
+            logs.push(newTest);
+
+            localStorage.setItem("neetLogs", JSON.stringify(logs));
+
+            alert("📄 Test duplicated successfully");
+
+            showScreen("history");
+        }
+
+        function deleteSelectedTests() {
+
+            if (selectedForDeletion.size === 0) {
+                alert("No tests selected.");
+                return;
+            }
+
+            const confirmDelete = confirm(
+                `Delete ${selectedForDeletion.size} selected test(s)?`
+            );
+
+            if (!confirmDelete) return;
+
+            let logs = JSON.parse(localStorage.getItem("neetLogs")) || [];
+
+            logs = logs.filter(log => !selectedForDeletion.has(log.id));
+
+            localStorage.setItem("neetLogs", JSON.stringify(logs));
+
+            selectedForDeletion.clear();
+            deleteModeActive = false;
+
+            const historyScreen = document.getElementById("history");
+            const deleteBtn = document.getElementById("deleteModeBtn");
+            const deleteSelectedBtn = document.getElementById("deleteSelectedBtn");
+            const backBtn = document.getElementById("historyBackBtn");
+            const homeBtn = document.getElementById("historyHomeBtn");
+
+            historyScreen.classList.remove("delete-mode");
+
+            deleteBtn.innerText = "🗑 Delete";
+            deleteSelectedBtn.style.display = "none";
+
+            backBtn.style.display = "inline-block";
+            homeBtn.style.display = "inline-block";
+
+            loadHistory();
+        }
+        
+        function toggleDeleteMode() {
+
+            deleteModeActive = !deleteModeActive;
+
+            const historyScreen = document.getElementById("history");
+            const deleteBtn = document.getElementById("deleteModeBtn");
+            const deleteSelectedBtn = document.getElementById("deleteSelectedBtn");
+            const backBtn = document.getElementById("historyBackBtn");
+            const homeBtn = document.getElementById("historyHomeBtn");
+
+            if (deleteModeActive) {
+
+                historyScreen.classList.add("delete-mode");
+
+                deleteBtn.innerText = "Cancel";
+                deleteSelectedBtn.style.display = "inline-block";
+                updateDeleteButtonLabel();
+
+                backBtn.style.display = "none";
+                homeBtn.style.display = "none";
+
+                document.getElementById("archiveModeBtn").style.display = "none";
+                document.getElementById("archiveSelectedBtn").style.display = "none";
+                document.getElementById("selectAllBtn").style.display = "inline-block";
+                document.getElementById("selectNoneBtn").style.display = "inline-block";
+
+            } else {
+
+                historyScreen.classList.remove("delete-mode");
+
+                deleteBtn.innerText = "🗑 Delete";
+                deleteSelectedBtn.style.display = "none";
+
+                backBtn.style.display = "inline-block";
+                homeBtn.style.display = "inline-block";
+
+                document.getElementById("archiveModeBtn").style.display = "inline-block";
+                document.getElementById("selectAllBtn").style.display = "none";
+                document.getElementById("selectNoneBtn").style.display = "none";
+
+                selectedForDeletion.clear();
+
+                updateDeleteButtonLabel();
+            }
+
+            loadHistory();
+        }
+
+        function updateDeleteButtonLabel() {
+
+            const deleteSelectedBtn = document.getElementById("deleteSelectedBtn");
+            const count = selectedForDeletion.size;
+
+            deleteSelectedBtn.innerText = `Delete Selected (${count})`;
+
+            deleteSelectedBtn.disabled = count === 0;
+        }
+
+        function archiveSelectedTests() {
+
+            if (selectedForArchive.size === 0) {
+                alert("No tests selected.");
+                return;
+            }
+
+            let logs = JSON.parse(localStorage.getItem("neetLogs")) || [];
+            const now = new Date().toISOString();
+
+            logs = logs.map(log => {
+
+                if (!selectedForArchive.has(log.id)) return log;
+
+                // ARCHIVE
+                if (archiveSelectionType === "active") {
+                    return {
+                        ...log,
+                        archived: true,
+                        archivedAt: now
+                    };
+                }
+
+                // UNARCHIVE
+                if (archiveSelectionType === "archived") {
+                    const { archivedAt, ...rest } = log;
+                    return {
+                        ...rest,
+                        archived: false
+                    };
+                }
+
+                return log;
+            });
+
+            localStorage.setItem("neetLogs", JSON.stringify(logs));
+
+            // Reset mode state
+            selectedForArchive.clear();
+            archiveSelectionType = null;
+            archiveModeActive = false;
+
+            const historyScreen = document.getElementById("history");
+            const archiveBtn = document.getElementById("archiveModeBtn");
+            const archiveSelectedBtn = document.getElementById("archiveSelectedBtn");
+            const backBtn = document.getElementById("historyBackBtn");
+            const homeBtn = document.getElementById("historyHomeBtn");
+
+            historyScreen.classList.remove("archive-mode");
+
+            archiveBtn.innerText = "📦 Archive";
+            archiveSelectedBtn.style.display = "none";
+
+            document.getElementById("deleteModeBtn").style.display = "inline-block";
+
+            backBtn.style.display = "inline-block";
+            homeBtn.style.display = "inline-block";
+
+            updateArchiveButtonLabel();
+            loadHistory();
+        }
+
+        function toggleArchiveMode() {
+
+            archiveModeActive = !archiveModeActive;
+
+            const historyScreen = document.getElementById("history");
+            const archiveBtn = document.getElementById("archiveModeBtn");
+            const archiveSelectedBtn = document.getElementById("archiveSelectedBtn");
+            const backBtn = document.getElementById("historyBackBtn");
+            const homeBtn = document.getElementById("historyHomeBtn");
+
+            // If delete mode is active, disable it
+            if (deleteModeActive) {
+                deleteModeActive = false;
+                selectedForDeletion.clear();
+                historyScreen.classList.remove("delete-mode");
+                document.getElementById("deleteModeBtn").innerText = "🗑 Delete";
+                document.getElementById("deleteSelectedBtn").style.display = "none";
+            }
+
+            if (archiveModeActive) {
+
+                historyScreen.classList.add("archive-mode");
+
+                archiveBtn.innerText = "Cancel";
+                archiveSelectedBtn.style.display = "inline-block";
+
+                backBtn.style.display = "none";
+                homeBtn.style.display = "none";
+
+                document.getElementById("deleteModeBtn").style.display = "none";
+                document.getElementById("deleteSelectedBtn").style.display = "none";
+                document.getElementById("selectAllBtn").style.display = "inline-block";
+                document.getElementById("selectNoneBtn").style.display = "inline-block";
+
+            } else {
+
+                historyScreen.classList.remove("archive-mode");
+
+                archiveBtn.innerText = "📦 Archive";
+                archiveSelectedBtn.style.display = "none";
+
+                backBtn.style.display = "inline-block";
+                homeBtn.style.display = "inline-block";
+
+                document.getElementById("deleteModeBtn").style.display = "inline-block";
+                document.getElementById("selectAllBtn").style.display = "none";
+                document.getElementById("selectNoneBtn").style.display = "none";
+
+                archiveSelectionType = null;
+
+                selectedForArchive.clear();
+
+                updateArchiveButtonLabel();
+            }
+
+            loadHistory();
+        }
+
+        function updateArchiveButtonLabel() {
+
+            const archiveSelectedBtn = document.getElementById("archiveSelectedBtn");
+
+            const count = selectedForArchive.size;
+
+            archiveSelectedBtn.disabled = count === 0;
+
+            if (count === 0) {
+                archiveSelectedBtn.innerText = "Archive Selected (0)";
+                return;
+            }
+
+            if (archiveSelectionType === "archived") {
+                archiveSelectedBtn.innerText = `Unarchive Selected (${count})`;
+            } else {
+                archiveSelectedBtn.innerText = `Archive Selected (${count})`;
+            }
+        }
+
+        function selectAllVisible() {
+
+            let logs = JSON.parse(localStorage.getItem("neetLogs")) || [];
+
+            const selectedFilter = document.getElementById("historyFilter")?.value || "all";
+            const searchQuery = document.getElementById("historySearch")?.value.toLowerCase() || "";
+
+            let filteredLogs = logs;
+
+            if (selectedFilter !== "all") {
+                filteredLogs = filteredLogs.filter(log => log.testType === selectedFilter);
+            }
+
+            if (searchQuery.trim() !== "") {
+                filteredLogs = filteredLogs.filter(log =>
+                    log.testName.toLowerCase().includes(searchQuery)
+                );
+            }
+
+            if (deleteModeActive) {
+                selectedForDeletion = new Set(filteredLogs.map(log => log.id));
+                updateDeleteButtonLabel();
+            }
+
+            if (archiveModeActive) {
+
+                const relevantLogs = filteredLogs.filter(log =>
+                    archiveSelectionType
+                        ? (archiveSelectionType === "archived" ? log.archived : !log.archived)
+                        : true
+                );
+
+                if (archiveSelectionType === null && relevantLogs.length > 0) {
+                    archiveSelectionType = relevantLogs[0].archived ? "archived" : "active";
+                }
+
+                selectedForArchive = new Set(
+                    relevantLogs
+                        .filter(log =>
+                            archiveSelectionType === "archived" ? log.archived : !log.archived
+                        )
+                        .map(log => log.id)
+                );
+
+                updateArchiveButtonLabel();
+            }
+
+            loadHistory();
+        }
+
+function selectNone() {
+
+    if (deleteModeActive) {
+        selectedForDeletion.clear();
+        updateDeleteButtonLabel();
+    }
+
+    if (archiveModeActive) {
+        selectedForArchive.clear();
+        archiveSelectionType = null;
+        updateArchiveButtonLabel();
+    }
+
+    loadHistory();
+}
 
         function openSavedTest(log) {
             currentViewingTest = log;
@@ -584,26 +1209,51 @@
             document.getElementById("zooC").value = log.rawData.zooC;
             document.getElementById("zooW").value = log.rawData.zooW;
 
+            lastScreen = "history";
             showScreen("calculate");
 
             calculateTotal();
+            
+            // ----- METADATA RENDER -----
+            const remarkLine = document.getElementById("remarkLine");
+            const metaLine1 = document.getElementById("metaLine1");
+            const metaLine2 = document.getElementById("metaLine2");
+            const metaLine3 = document.getElementById("metaLine3");
 
             const created = new Date(log.createdAt).toLocaleString();
             const updated = new Date(log.updatedAt).toLocaleString();
 
-            document.getElementById("metaInfo").innerText =
-                "Saved: " + created +
-                " | Updated: " + updated +
-                " | v" + log.version;
-            
-            // Show remark in VIEW MODE
-            if (log.editRemark) {
-                document.getElementById("remarkDisplay").innerText =
-                    "Remark: " + log.editRemark;
-                document.getElementById("remarkDisplay").style.display = "block";
+            // 1️⃣ Remark inline
+            if (log.editRemark && log.editRemark.trim() !== "") {
+                remarkLine.innerText = "Remark: " + log.editRemark;
+                remarkLine.style.display = "block";
             } else {
-                document.getElementById("remarkDisplay").style.display = "none";
+                remarkLine.innerText = "";
+                remarkLine.style.display = "none";
             }
+
+            // 2️⃣ Version
+            metaLine1.innerText = "Version: v" + log.version;
+
+            // 3️⃣ Saved | Updated
+            metaLine2.innerText = 
+                "Saved on: " + created + 
+                " | Updated on: " + updated;
+
+            // 4️⃣ Imported | Duplicated (conditional divider)
+            let line3Parts = [];
+
+            if (log.importedAt) {
+                line3Parts.push("Imported on: " + 
+                    new Date(log.importedAt).toLocaleString());
+            }
+
+            if (log.duplicatedAt) {
+                line3Parts.push("Duplicated on: " + 
+                    new Date(log.duplicatedAt).toLocaleString());
+            }
+
+            metaLine3.innerText = line3Parts.join(" | ");
 
             // 🔁 Mark that we are editing an existing test
             document.querySelector(
@@ -641,8 +1291,6 @@
         function resetCalculateScreen() {
             liveCalculationEnabled = false;
 
-            document.getElementById("remarkDisplay").style.display = "none";
-
             // Clear inputs
             document.querySelectorAll("#calculate input")
                 .forEach(el => {
@@ -656,10 +1304,15 @@
             // Clear text outputs
             [
                 "phyResult","chemResult","botResult","zooResult",
-                "totalResult","percentageResult","equivalentResult","metaInfo"
+                "totalResult","percentageResult","equivalentResult"
             ].forEach(id => {
                 document.getElementById(id).innerText = "";
             });
+
+            document.getElementById("remarkLine").style.display = "none";
+            document.getElementById("metaLine1").innerText = "";
+            document.getElementById("metaLine2").innerText = "";
+            document.getElementById("metaLine3").innerText = "";
 
             // Force EDIT MODE visuals
             enterEditMode();
@@ -672,24 +1325,26 @@
             calc.classList.add("mode-transition");
             setTimeout(() => calc.classList.remove("mode-transition"), 200);
             
-            // Activate report mode
+            // Activate report mode and hide Edit Remark
             document.getElementById("calculate").classList.add("view-mode");
+            document.getElementById("editRemarkWrapper").style.display = "none";
 
-            // Copy input values into view spans
+            // Copy Test Name
+            document.getElementById("testName_view").innerText =
+                document.getElementById("testName").value;
+
+            // Copy Test Type
+            const typeSelect = document.getElementById("testType");
+            document.getElementById("testType_view").innerText =
+                typeSelect.options[typeSelect.selectedIndex].text;
+
+            // Copy subject values
             [
                 "phyC","phyW",
                 "chemC","chemW",
                 "botC","botW",
                 "zooC","zooW"
             ].forEach(id => {
-                // Copy Test Name
-                document.getElementById("testName_view").innerText =
-                    document.getElementById("testName").value;
-
-                // Copy Test Type (display text, not value)
-                const typeSelect = document.getElementById("testType");
-                document.getElementById("testType_view").innerText =
-                    typeSelect.options[typeSelect.selectedIndex].text;
                 const input = document.getElementById(id);
                 const span = document.getElementById(id + "_view");
                 if (span) span.innerText = input.value;
@@ -709,6 +1364,8 @@
             // Show view-mode buttons
             document.getElementById("editBtn").style.display = "inline-block";
             document.getElementById("deleteBtn").style.display = "inline-block";
+            document.getElementById("archiveBtn").style.display = "inline-block";
+            document.getElementById("duplicateBtn").style.display = "inline-block";
         }
 
         function enterEditMode() {
@@ -732,6 +1389,8 @@
             // Hide view-mode buttons
             document.getElementById("editBtn").style.display = "none";
             document.getElementById("deleteBtn").style.display = "none";
+            document.getElementById("archiveBtn").style.display = "none";
+            document.getElementById("duplicateBtn").style.display = "none";
 
             // Set correct button label
             if (currentViewingTest === null) {
@@ -746,36 +1405,6 @@
             } else {
                 document.getElementById("editRemarkWrapper").style.display = "none";
             }
-
-            document.getElementById("remarkDisplay").style.display = "none";
-        }
-
-        function deleteCurrentTest() {
-            if (!currentViewingTest) {
-                alert("❌ No test selected to delete.");
-                return;
-            }
-
-            const confirmDelete = confirm(
-                `Delete "${currentViewingTest.testName}"?\nThis cannot be undone.`
-            );
-
-            if (!confirmDelete) return;
-
-            const logs = JSON.parse(localStorage.getItem("neetLogs")) || [];
-
-            const updatedLogs = logs.filter(
-                log => log.id !== currentViewingTest.id
-            );
-
-            localStorage.setItem("neetLogs", JSON.stringify(updatedLogs));
-
-            currentViewingTest = null;
-
-            resetCalculateScreen();
-            showScreen("history");
-
-            alert("🗑️ Test deleted");
         }
 
         function exportTests() {
@@ -807,21 +1436,43 @@
                 if (!file) return;
 
                 const reader = new FileReader();
+
                 reader.onload = function () {
                     try {
-                        JSON.parse(reader.result); // validate JSON
-                        const confirmImport = confirm(
-                            "This will REPLACE all existing tests.\nContinue?"
-                        );
-                        if (!confirmImport) return;
+                        const importedLogs = JSON.parse(reader.result);
 
-                        localStorage.setItem("neetLogs", reader.result);
-                        alert("✅ Tests imported successfully");
+                        if (!Array.isArray(importedLogs)) {
+                            alert("❌ Invalid file format");
+                            return;
+                        }
+
+                        const existingLogs = JSON.parse(localStorage.getItem("neetLogs")) || [];
+
+                        const now = new Date().toISOString();
+
+                        const mergedLogs = [
+                            ...existingLogs,
+                            ...importedLogs.map(log => {
+                                return {
+                                    ...log,
+                                    id: Date.now() + Math.random(), // ensure unique ID
+                                    imported: true,
+                                    importedAt: now,
+                                };
+                            })
+                        ];
+
+                        localStorage.setItem("neetLogs", JSON.stringify(mergedLogs));
+
+                        alert("✅ Tests imported and merged successfully");
+
                         showScreen("history");
+
                     } catch {
                         alert("❌ Invalid file");
                     }
                 };
+
                 reader.readAsText(file);
             };
 
@@ -857,6 +1508,7 @@
 
         });
 
+        document.getElementById("historySort")?.addEventListener("change", loadHistory);
         document.getElementById("historyFilter")?.addEventListener("change", loadHistory);
         document.getElementById("historySearch")?.addEventListener("input", loadHistory);
 

@@ -297,13 +297,10 @@ button {
 #calculate .results-left p {
   font-size: 1.25rem;
   font-weight: 600;
+  margin: 8px 0;
 }
 
 /* ===== Results Structuce Polish ===== */
-
-#calculate .results-left p {
-  margin: 8px 0;
-}
 
 #calculate .results-right {
   padding-left: 10px;
@@ -336,12 +333,12 @@ button {
 
 /* Primary — Save */
 #calculate .btn-primary {
-  background: #081531;
-  color: #ffffff;
+  background: #ffffff;
+  color: #081531;
 }
 
 #calculate .btn-primary:hover {
-  background: #0f2147;
+  background: #d1d5db;
 }
 
 #calculate .action-buttons button:active {
@@ -360,15 +357,15 @@ button {
 
 /* Neutral — Back */
 #calculate .btn-neutral {
-  background: #ffffff;
-  color: #081531;
-  grid-column: 1 / -1;     /* span full row */
+  background: #081531;
+  color: #ffffff;
+  grid-column: 1 / -1;
   width: 100%;
-  justify-self: center;    /* center horizontally */
+  justify-self: center;
 }
 
 #calculate .btn-neutral:hover {
-  background: #d1d5db;
+  background: #0f2147;
 }
 
 /* Outline — Edit */
@@ -455,6 +452,23 @@ button {
 }
 
 /* =========================
+   U6 - Remark UI Update
+   ========================= */
+
+#calculate #metadataBlock p:not(#remarkLine) {
+  font-family: 'Comic Neue', cursive;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+#calculate #remarkLine {
+  font-family: 'Henny Penny', cursive;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+/* =========================
    U5 — HISTORY ENTRIES
    ========================= */
 
@@ -471,6 +485,7 @@ button {
   border: none;
   border-radius: 12px;
   padding: 16px;
+  font-family: 'Irish Grover', cursive;
   font-size: 1.2rem;
   text-align: left;
   cursor: pointer;
@@ -497,17 +512,17 @@ button {
 
 /* History Back Button */
 
-/* Neutral — Back */
+/* Neutral — Back (NOW DARK) */
 #history .btn-neutral {
-  background: #ffffff;
-  color: #081531;
-  grid-column: 1 / -1;     /* span full row */
+  background: #081531;
+  color: #ffffff;
+  grid-column: 1 / -1;
   width: 100%;
-  justify-self: center;    /* center horizontally */
+  justify-self: center;
 }
 
 #history .btn-neutral:hover {
-  background: #d1d5db;
+  background: #0f2147;
 }
 
 #history .action-buttons {
@@ -530,10 +545,20 @@ button {
   transform: scale(0.98);
 }
 
+/* Danger — Delete */
+#history .btn-danger {
+  background: #b91c1c;
+  color: #ffffff;
+}
+
+#history .btn-danger:hover {
+  background: #991b1b;
+}
+
 /* U5 - History Card Font and Font Size Override */
 
 #history h2 {
-  font-size: 3.5rem;
+  font-size: 5rem;
   margin: 24px 0 18px 0;
   text-align: center;
 }
@@ -546,8 +571,159 @@ button {
   line-height: 1.2;
 }
 
-#historyList button {
-  font-family: 'Irish Grover', cursive;
+/* ===== Import Badge ===== */
+
+#historyList .history-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+  gap: 10px;
+}
+
+#historyList .import-badge {
+  font-size: 0.75rem;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: #081531;
+  color: #ffffff;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+/* ===== Duplicate Badge ===== */
+
+#historyList .duplicate-badge {
+  font-size: 0.75rem;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: #374151;
+  color: #ffffff;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+/* ===== History Dividers ===== */
+
+#history .history-divider {
+  border: none;
+  height: 2.5px;
+  background: #081531;
+  margin: 18px 0;
+}
+
+/* ===== History Empty State ===== */
+
+#historyList .history-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 32px 10px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #081531;
+  opacity: 0.75;
+}
+
+/* ===== History Fade Animation ===== */
+
+@keyframes historyFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#historyList > * {
+  animation: historyFadeIn 0.25s ease;
+}
+
+/* ===== History Controls Layout ===== */
+
+#history .history-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto 2fr;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+#history .history-controls select,
+#history .history-controls input {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: none;
+  font-size: 1rem;
+}
+
+#history .history-controls input {
+  background: #ffffff;
+}
+
+#history .controls-divider {
+  width: 2px;
+  background: #081531;
+  opacity: 0.6;
+}
+
+/* ===== Delete Mode Controls ===== */
+
+#history .delete-checkbox {
+  margin-right: 10px;
+  transform: scale(1.2);
+  cursor: pointer;
+}
+
+#history .history-card-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ===== Selected Card Highlight ===== */
+
+/* Delete selection */
+#history.delete-mode #historyList button.selected-card {
+  background: #ffeaea;
+  border: 2px solid #b91c1c;
+}
+
+/* Archive selection */
+#history.archive-mode #historyList button.selected-card {
+  background: #e6f0ff;
+  border: 2px solid #3b82f6;
+}
+
+/* ===== U6.3 - Archive Mode ===== */
+
+#historyList button.archived-card {
+  background: #e5e7eb;
+  opacity: 0.8;
+}
+
+#historyList .archive-toggle {
+  grid-column: 1 / -1;
+  text-align: center;
+  justify-self: center;
+  width: 100%;
+  font-size: 1.3rem;
+}
+
+#history .action-buttons button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Match Select All/None height with filter controls */
+#history #selectAllBtn,
+#history #selectNoneBtn {
+  padding: 10px 12px;
+  font-size: 1rem;
+  border-radius: 8px;
 }
 
 
