@@ -4,6 +4,7 @@
   <head>
     <title>Hriman's NEET Calculator</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   </head>
 
   <body>
@@ -162,6 +163,8 @@
 
             <button class="btn-outline" onclick="duplicateCurrentTest()" id="duplicateBtn">📄 Duplicate</button>
 
+            <button class="btn-primary btn-export" onclick="exportCurrentTestAsJPG()" id="exportJpgBtn" style="display:none;">📸 Export as JPG</button>
+
             <button class="btn-neutral" onclick="handleBack()">⬅ Back</button>
 
             <button class="btn-neutral" onclick="showScreen('home')">🏠 Home</button>
@@ -184,18 +187,26 @@
 
             <hr class="history-divider">
 
+            <div class="history-controls-labels">
+                <span>Sort:</span>
+                <span>Filter:</span>
+                <div class="controls-divider"></div>
+                <span>Search:</span>
+            </div>
+
             <div class="history-controls">
                 <select id="historySort">
-                    <option value="created_desc">Created (Newest)</option>
-                    <option value="created_asc">Created (Oldest)</option>
-                    <option value="updated_desc">Updated (Newest)</option>
-                    <option value="version_desc">Version (Highest)</option>
+                    <option value="created_desc">Created (Newest → Oldest)</option>
+                    <option value="created_asc">Created (Oldest → Newest)</option>
+                    <option value="updated_desc">Updated (Newest → Oldest)</option>
+                    <option value="version_desc">Version (Highest → Lowest)</option>
                 </select>
                 
                 <select id="historyFilter">
                     <option value="all">All Tests</option>
                     <option value="major">Major (720)</option>
                     <option value="minor">Minor (400)</option>
+                    <option value="imported">Imported</option>
                 </select>
 
                 <div class="controls-divider"></div>
@@ -638,8 +649,12 @@
             // Filter by type
             let filteredLogs = logs;
 
-            if (selectedFilter !== "all") {
+            if (selectedFilter === "major" || selectedFilter === "minor") {
                 filteredLogs = filteredLogs.filter(log => log.testType === selectedFilter);
+            }
+
+            if (selectedFilter === "imported") {
+                filteredLogs = filteredLogs.filter(log => log.imported === true);
             }
 
             // Filter by search (test name only)
@@ -923,6 +938,10 @@
             backBtn.style.display = "inline-block";
             homeBtn.style.display = "inline-block";
 
+            document.getElementById("archiveModeBtn").style.display = "inline-block";
+            document.getElementById("selectAllBtn").style.display = "none";
+            document.getElementById("selectNoneBtn").style.display = "none";
+
             loadHistory();
         }
         
@@ -1134,8 +1153,12 @@
 
             let filteredLogs = logs;
 
-            if (selectedFilter !== "all") {
+            if (selectedFilter === "major" || selectedFilter === "minor") {
                 filteredLogs = filteredLogs.filter(log => log.testType === selectedFilter);
+            }
+
+            if (selectedFilter === "imported") {
+                filteredLogs = filteredLogs.filter(log => log.imported === true);
             }
 
             if (searchQuery.trim() !== "") {
@@ -1367,6 +1390,9 @@ function selectNone() {
             document.getElementById("deleteBtn").style.display = "inline-block";
             document.getElementById("archiveBtn").style.display = "inline-block";
             document.getElementById("duplicateBtn").style.display = "inline-block";
+            if (DEV_MODE) {
+                document.getElementById("exportJpgBtn").style.display = "inline-block";
+            }
         }
 
         function enterEditMode() {
@@ -1392,6 +1418,7 @@ function selectNone() {
             document.getElementById("deleteBtn").style.display = "none";
             document.getElementById("archiveBtn").style.display = "none";
             document.getElementById("duplicateBtn").style.display = "none";
+            document.getElementById("exportJpgBtn").style.display = "none";
 
             // Set correct button label
             if (currentViewingTest === null) {
@@ -1454,11 +1481,18 @@ function selectNone() {
                         const mergedLogs = [
                             ...existingLogs,
                             ...importedLogs.map(log => {
+                                const {
+                                    archived,
+                                    archivedAt,
+                                    ...rest
+                                    } = log;
+
                                 return {
-                                    ...log,
-                                    id: Date.now() + Math.random(), // ensure unique ID
+                                    ...rest,
+                                    id: Date.now() + Math.random(),
                                     imported: true,
                                     importedAt: now,
+                                    archived: false
                                 };
                             })
                         ];
@@ -1478,6 +1512,59 @@ function selectNone() {
             };
 
             input.click();
+        }
+
+        function exportCurrentTestAsJPG() {
+
+            if (!currentViewingTest) return;
+
+            const original = document.querySelector("#calculate .results-section");
+
+            const clone = original.cloneNode(true);
+
+            // Remove metaLine3 (imported / duplicated)
+            const metaLine3 = clone.querySelector("#metaLine3");
+            if (metaLine3) metaLine3.remove();
+
+            // Add export timestamp
+            const metaBlock = clone.querySelector("#metadataBlock");
+            if (metaBlock) {
+                const exportLine = document.createElement("p");
+                exportLine.innerText =
+                    "Exported on: " + new Date().toLocaleString();
+                exportLine.style.fontFamily = "Comic Neue, cursive";
+                exportLine.style.fontSize = "1rem";
+                exportLine.style.marginTop = "8px";
+                metaBlock.appendChild(exportLine);
+            }
+
+            // Create clean container
+            const container = document.createElement("div");
+            container.style.background = "#2fc87e";
+            container.style.padding = "28px";
+            container.style.borderRadius = "16px";
+            container.style.width = "700px";
+            container.style.color = "#081531";
+            container.appendChild(clone);
+
+            container.style.position = "fixed";
+            container.style.left = "-9999px";
+            document.body.appendChild(container);
+
+            html2canvas(container, {
+                scale: 2,
+                backgroundColor: "#2fc87e"
+            }).then(canvas => {
+
+                const link = document.createElement("a");
+                link.download =
+                    currentViewingTest.testName.replace(/\s+/g, "_") + ".jpg";
+
+                link.href = canvas.toDataURL("image/jpeg", 0.95);
+                link.click();
+
+                document.body.removeChild(container);
+            });
         }
         
         // 🔄 Live calculation on input change
