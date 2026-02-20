@@ -276,7 +276,7 @@
     <script>
         let currentViewingTest = null;
         let lastScreen = "home";
-        const DEV_MODE = true; // Set to true to enable auto-filled test for faster development
+        const DEV_MODE = false; // Set to true to enable auto-filled test for faster development
         let liveCalculationEnabled = false;
         let deleteModeActive = false;
         let selectedForDeletion = new Set();
@@ -1063,6 +1063,7 @@
                 historyScreen.classList.remove("delete-mode");
                 document.getElementById("deleteModeBtn").innerText = "🗑 Delete";
                 document.getElementById("deleteSelectedBtn").style.display = "none";
+                updateDeleteButtonLabel();
             }
 
             if (archiveModeActive) {
